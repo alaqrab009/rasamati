@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>لوحة الإدارة</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Tahoma, Arial, sans-serif; background: #faf5ec; color: #3e2a1e; padding-bottom: 90px; }
+.bar { background: #3e2a1e; border-bottom: 3px solid #c99749; color: #e2c597; padding: 16px; text-align: center; font-size: 20px; font-weight: bold; }
+.wrap { max-width: 800px; margin: 0 auto; padding: 16px; }
+.box { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+.box h2 { font-size: 18px; margin-bottom: 12px; color: #9c4517; }
+label { display: block; font-size: 14px; margin: 10px 0 4px; color: #555; }
+input[type=text], input[type=password], input[type=number], input[type=tel] { width: 100%; padding: 11px; font-size: 16px; border: 1px solid #cfc7bb; border-radius: 8px; }
+button { cursor: pointer; font-family: inherit; font-size: 15px; border: 0; border-radius: 8px; padding: 10px 16px; background: #9c4517; color: #fff; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.gray { background: #8a8f94; }
+button.red { background: #b3392f; }
+button.gold { background: #c99749; }
+.row { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+.product { border: 1px solid #e3ddd2; border-radius: 10px; padding: 10px; margin-top: 12px; }
+.product .fields { display: grid; grid-template-columns: 70px 1fr 90px; gap: 8px; }
+.product .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.thumb { position: relative; width: 74px; height: 74px; border-radius: 8px; overflow: hidden; background: #eee; border: 1px solid #e3ddd2; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb .num { position: absolute; top: 2px; right: 2px; background: rgba(62,42,30,0.75); color: #e2c597; font-size: 10px; font-weight: bold; padding: 0 5px; border-radius: 8px; line-height: 15px; }
+.thumb .rm { position: absolute; bottom: 2px; left: 2px; background: rgba(179,57,47,0.9); color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; line-height: 20px; padding: 0; text-align: center; }
+.thumb.add { display: flex; align-items: center; justify-content: center; border: 1px dashed #c99749; background: #fff; color: #c99749; font-size: 24px; cursor: pointer; }
+.hint { font-size: 12px; color: #8a7a6b; margin-top: 6px; }
+select { width: 100%; padding: 11px; font-size: 15px; border: 1px solid #cfc7bb; border-radius: 8px; background: #fff; font-family: inherit; color: #3e2a1e; }
+.cat-chip { display: inline-flex; align-items: center; gap: 6px; background: #faf5ec; border: 1px solid #e3ddd2; border-radius: 20px; padding: 6px 8px 6px 14px; font-size: 14px; margin: 4px 6px 0 0; }
+.cat-chip button { background: #b3392f; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; line-height: 20px; padding: 0; text-align: center; }
+.cat-add { display: flex; gap: 8px; margin-top: 12px; }
+.cat-add input { flex: 1; }
+.cat-list { display: flex; flex-wrap: wrap; }
+.cat-empty { font-size: 13px; color: #8a7a6b; }
+.msg { margin-top: 10px; font-size: 14px; line-height: 1.8; }
+.ok { color: #1b7a3b; }
+.err { color: #b3392f; }
+.savebar { position: fixed; bottom: 0; right: 0; left: 0; background: #fff; border-top: 1px solid #ddd; padding: 12px; text-align: center; }
+.savebar button { width: 100%; max-width: 500px; font-size: 17px; padding: 13px; background: #9c4517; border: 1px solid #c99749; color: #e2c597; }
+details summary { cursor: pointer; font-weight: bold; color: #9c4517; }
+ol { margin: 10px 20px 0 0; line-height: 2; font-size: 14px; }
+a { color: #25406b; }
+@media (max-width: 520px) {
+  .product .fields { grid-template-columns: 60px 1fr 80px; }
+  .thumb, .thumb.add { width: 64px; height: 64px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bar">لوحة الإدارة</div>
+
+<div class="wrap" id="loginBox">
+  <div class="box">
+    <h2>الدخول</h2>
+    <label>الرقم السري</label>
+    <input type="password" id="pinInput" inputmode="numeric" autocomplete="off">
+    <div class="row">
+      <button id="loginBtn">دخول</button>
+      <a href="index.html">رجوع للموقع</a>
+    </div>
+    <p class="msg err" id="loginMsg"></p>
+  </div>
+</div>
+
+<div class="wrap" id="panel" hidden>
+
+  <div class="box">
+    <h2>نصوص الموقع</h2>
+    <label>العنوان (المربع الأعلى)</label>
+    <input type="text" id="fTitle">
+    <label>السطر تحت العنوان</label>
+    <input type="text" id="fSubtitle">
+    <label>السطر الأسفل</label>
+    <input type="text" id="fFooter">
+  </div>
+
+  <div class="box">
+    <h2>رقم الواتساب لجميع المنتجات</h2>
+    <label>الرقم بالصيغة الدولية، مثال: 966554645623</label>
+    <input type="tel" id="fWhatsapp" inputmode="numeric">
+    <p class="msg" id="waHint"></p>
+  </div>
+
+  <div class="box">
+    <h2>أقسام المتجر</h2>
+    <p class="hint">أنشئ أقسام مثل "نسائي" و"رجالي"، وبعدها اختر لكل منتج قسمه من القائمة في بطاقته بالأسفل. المنتج بدون قسم يظهر في "بدون قسم". اضغط على اسم أي قسم لتعديله.</p>
+    <div class="cat-list" id="catList"></div>
+    <div class="cat-add">
+      <input type="text" id="catInput" placeholder="اسم القسم الجديد">
+      <button class="gold" id="catAddBtn">إضافة قسم</button>
+    </div>
+    <p class="msg" id="catMsg"></p>
+  </div>
+
+  <div class="box">
+    <h2>المنتجات</h2>
+    <p class="hint">كل منتج يقبل من صورة وحدة إلى 4 صور. إذا فيه أكثر من صورة، تظهر للعميل قابلة للتنقل يمين ويسار.</p>
+    <div id="productsList"></div>
+    <div class="row">
+      <button class="gold" id="addBtn">+ إضافة منتج جديد</button>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>تغيير الرقم السري</h2>
+    <label>الرقم السري الحالي</label>
+    <input type="password" id="pinOld" inputmode="numeric" autocomplete="off">
+    <label>الرقم السري الجديد (4 أرقام فأكثر)</label>
+    <input type="password" id="pinNew" inputmode="numeric" autocomplete="off">
+    <label>أعد كتابة الجديد</label>
+    <input type="password" id="pinNew2" inputmode="numeric" autocomplete="off">
+    <div class="row"><button id="pinBtn">تغيير الرقم السري</button></div>
+    <p class="msg" id="pinMsg"></p>
+  </div>
+
+  <div class="box">
+    <details id="tokenBox">
+      <summary>مفتاح النشر (مرة واحدة فقط على كل جهاز)</summary>
+      <ol>
+        <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">صفحة إنشاء المفتاح</a>.</li>
+        <li>الاسم: متجر، والمدة: سنة.</li>
+        <li>في خانة Repository access اختر Only select repositories ثم rasamati.</li>
+        <li>في Permissions افتح Repository permissions وغيّر Contents إلى Read and write.</li>
+        <li>اضغط Generate token وانسخ المفتاح الطويل والصقه هنا.</li>
+      </ol>
+      <label>المفتاح</label>
+      <input type="password" id="tokenInput" autocomplete="off">
+      <div class="row">
+        <button id="tokenBtn">حفظ المفتاح على هذا الجهاز</button>
+        <button class="gray" id="tokenDel">حذف المفتاح</button>
+      </div>
+      <p class="msg" id="tokenMsg"></p>
+    </details>
+  </div>
+
+</div>
+
+<div class="savebar" id="saveBar" hidden>
+  <button id="saveBtn">حفظ ونشر الموقع</button>
+  <p class="msg" id="saveMsg"></p>
+</div>
+
+<script>
+var OWNER = 'alaqrab009';
+var REPO = 'rasamati';
+var BRANCH = 'main';
+var MAX_IMAGES = 4;
+
+var data = null;
+var pending = {};
+var previews = {};
+
+function $(id) { return document.getElementById(id); }
+
+function setMsg(el, text, cls) {
+  el.textContent = text;
+  el.className = 'msg ' + (cls || '');
+}
+
+async function sha256(text) {
+  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(function (b) {
+    return b.toString(16).padStart(2, '0');
+  }).join('');
+}
+
+function toB64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+function getToken() {
+  try { return localStorage.getItem('gh_token') || ''; } catch (e) { return ''; }
+}
+
+function ghHeaders(extra) {
+  var h = {
+    'Authorization': 'Bearer ' + getToken(),
+    'Accept': 'application/vnd.github+json'
+  };
+  for (var k in (extra || {})) { h[k] = extra[k]; }
+  return h;
+}
+
+function ghUrl(path) {
+  return 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + path;
+}
+
+function normalizePhone(s) {
+  var d = String(s).replace(/\D/g, '');
+  if (d.indexOf('00') === 0) { d = d.substring(2); }
+  if (d.length === 10 && d.indexOf('05') === 0) { d = '966' + d.substring(1); }
+  if (d.length === 9 && d.charAt(0) === '5') { d = '966' + d; }
+  return d;
+}
+
+/* ---------- تحميل البيانات ---------- */
+
+async function loadPublic() {
+  var r = await fetch('data.json?t=' + Date.now());
+  return r.json();
+}
+
+async function loadFresh() {
+  if (!getToken()) { return null; }
+  try {
+    var r = await fetch(ghUrl('data.json') + '?ref=' + BRANCH + '&t=' + Date.now(), {
+      headers: ghHeaders({ 'Accept': 'application/vnd.github.raw+json' })
+    });
+    if (!r.ok) { return null; }
+    return await r.json();
+  } catch (e) { return null; }
+}
+
+function normalizeProducts() {
+  if (!Array.isArray(data.categories)) { data.categories = []; }
+  data.products.forEach(function (p) {
+    if (!p.images) {
+      p.images = p.image ? [p.image] : [];
+      delete p.image;
+    }
+    if (typeof p.category !== 'string') { p.category = ''; }
+  });
+}
+
+/* ---------- الدخول ---------- */
+
+async function login() {
+  var pin = $('pinInput').value.trim();
+  if (!pin) { return; }
+  if (!data) {
+    try { data = await loadPublic(); } catch (e) {
+      setMsg($('loginMsg'), 'تعذر تحميل البيانات، حدّث الصفحة', 'err');
+      return;
+    }
+  }
+  var h = await sha256(pin);
+  if (h !== data.pinHash) {
+    setMsg($('loginMsg'), 'الرقم السري غير صحيح', 'err');
+    return;
+  }
+  var fresh = await loadFresh();
+  if (fresh) { data = fresh; }
+  normalizeProducts();
+  $('loginBox').hidden = true;
+  $('panel').hidden = false;
+  $('saveBar').hidden = false;
+  fillForm();
+  if (!getToken()) { $('tokenBox').open = true; }
+}
+
+/* ---------- تعبئة الواجهة ---------- */
+
+function fillForm() {
+  $('fTitle').value = data.title;
+  $('fSubtitle').value = data.subtitle;
+  $('fFooter').value = data.footer;
+  $('fWhatsapp').value = data.whatsapp;
+  renderCategories();
+  renderProducts();
+}
+
+/* ---------- الأقسام ---------- */
+
+function renderCategories() {
+  var box = $('catList');
+  box.innerHTML = '';
+  if (data.categories.length === 0) {
+    var p = document.createElement('p');
+    p.className = 'cat-empty';
+    p.textContent = 'ما فيه أقسام بعد. أضف أول قسم من الأسفل.';
+    box.appendChild(p);
+  }
+  data.categories.forEach(function (cat, idx) {
+    var chip = document.createElement('span');
+    chip.className = 'cat-chip';
+
+    var label = document.createElement('span');
+    label.textContent = cat;
+    label.title = 'اضغط للتعديل';
+    label.style.cursor = 'pointer';
+    label.onclick = function () {
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.value = cat;
+      input.style.width = Math.max(60, cat.length * 9) + 'px';
+
+      function commit() {
+        var newName = input.value.trim();
+        if (!newName || newName === cat) { renderCategories(); return; }
+        if (data.categories.indexOf(newName) !== -1 && newName !== cat) {
+          setMsg($('catMsg'), 'هذا القسم موجود مسبقاً', 'err');
+          renderCategories();
+          return;
+        }
+        data.categories[idx] = newName;
+        data.products.forEach(function (p) { if (p.category === cat) { p.category = newName; } });
+        setMsg($('catMsg'), 'تم تعديل اسم القسم', 'ok');
+        renderCategories();
+        renderProducts();
+      }
+
+      input.onkeydown = function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        if (e.key === 'Escape') { e.preventDefault(); renderCategories(); }
+      };
+      input.onblur = commit;
+
+      chip.replaceChild(input, label);
+      input.focus();
+      input.select();
+    };
+    chip.appendChild(label);
+
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.textContent = '×';
+    del.onclick = function () {
+      var inUse = data.products.filter(function (p) { return p.category === cat; }).length;
+      var msg = inUse > 0
+        ? ('حذف قسم "' + cat + '"؟ ' + inUse + ' منتج فيه راح يرجع بدون قسم.')
+        : ('حذف قسم "' + cat + '"؟');
+      if (!confirm(msg)) { return; }
+      data.categories.splice(idx, 1);
+      data.products.forEach(function (p) { if (p.category === cat) { p.category = ''; } });
+      renderCategories();
+      renderProducts();
+    };
+    chip.appendChild(del);
+
+    box.appendChild(chip);
+  });
+}
+
+$('catAddBtn').onclick = function () {
+  var name = $('catInput').value.trim();
+  var m = $('catMsg');
+  if (!name) { setMsg(m, 'اكتب اسم القسم أول', 'err'); return; }
+  if (data.categories.indexOf(name) !== -1) { setMsg(m, 'هذا القسم موجود مسبقاً', 'err'); return; }
+  data.categories.push(name);
+  $('catInput').value = '';
+  setMsg(m, 'تم إضافة القسم', 'ok');
+  renderCategories();
+  renderProducts();
+};
+
+$('catInput').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') { e.preventDefault(); $('catAddBtn').click(); }
+});
+
+function imgSrc(path) {
+  return previews[path] || path || '';
+}
+
+function renderProducts() {
+  var box = $('productsList');
+  box.innerHTML = '';
+  data.products.forEach(function (p, i) {
+    var el = document.createElement('div');
+    el.className = 'product';
+
+    var fields = document.createElement('div');
+    fields.className = 'fields';
+
+    var idIn = document.createElement('input');
+    idIn.type = 'number';
+    idIn.value = p.id;
+    idIn.title = 'الرقم';
+    idIn.oninput = function () { p.id = parseInt(idIn.value, 10) || 0; };
+
+    var nameIn = document.createElement('input');
+    nameIn.type = 'text';
+    nameIn.value = p.name;
+    nameIn.placeholder = 'اسم المنتج';
+    nameIn.oninput = function () { p.name = nameIn.value; };
+
+    var priceIn = document.createElement('input');
+    priceIn.type = 'number';
+    priceIn.value = p.price;
+    priceIn.placeholder = 'السعر';
+    priceIn.oninput = function () { p.price = parseFloat(priceIn.value) || 0; };
+
+    fields.appendChild(idIn);
+    fields.appendChild(nameIn);
+    fields.appendChild(priceIn);
+
+    var catLabel = document.createElement('label');
+    catLabel.textContent = 'القسم';
+    var catSel = document.createElement('select');
+    var noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = 'بدون قسم';
+    catSel.appendChild(noneOpt);
+    data.categories.forEach(function (cat) {
+      var opt = document.createElement('option');
+      opt.value = cat;
+      opt.textContent = cat;
+      if (p.category === cat) { opt.selected = true; }
+      catSel.appendChild(opt);
+    });
+    catSel.onchange = function () { p.category = catSel.value; };
+
+    var thumbs = document.createElement('div');
+    thumbs.className = 'thumbs';
+
+    function renderThumbs() {
+      thumbs.innerHTML = '';
+      p.images.forEach(function (path, idx) {
+        var t = document.createElement('div');
+        t.className = 'thumb';
+
+        var im = document.createElement('img');
+        im.src = imgSrc(path);
+        t.appendChild(im);
+
+        var num = document.createElement('span');
+        num.className = 'num';
+        num.textContent = idx + 1;
+        t.appendChild(num);
+
+        var rm = document.createElement('button');
+        rm.className = 'rm';
+        rm.type = 'button';
+        rm.textContent = '×';
+        rm.onclick = function () {
+          p.images.splice(idx, 1);
+          renderThumbs();
+        };
+        t.appendChild(rm);
+
+        thumbs.appendChild(t);
+      });
+
+      if (p.images.length < MAX_IMAGES) {
+        var addT = document.createElement('div');
+        addT.className = 'thumb add';
+        addT.textContent = '+';
+        addT.onclick = function () { file.click(); };
+        thumbs.appendChild(addT);
+      }
+    }
+
+    var file = document.createElement('input');
+    file.type = 'file';
+    file.accept = 'image/*';
+    file.multiple = true;
+    file.style.display = 'none';
+    file.onchange = async function () {
+      var files = Array.prototype.slice.call(file.files || []);
+      file.value = '';
+      for (var f = 0; f < files.length; f++) {
+        if (p.images.length >= MAX_IMAGES) { break; }
+        try {
+          var res = await compressImage(files[f]);
+          var name = 'images/p' + Date.now() + '_' + f + '.jpg';
+          pending[name] = res.b64;
+          previews[name] = res.dataUrl;
+          p.images.push(name);
+        } catch (e) {
+          alert('تعذر قراءة إحدى الصور، تم تجاهلها');
+        }
+      }
+      renderThumbs();
+    };
+
+    renderThumbs();
+
+    var acts = document.createElement('div');
+    acts.className = 'acts';
+
+    var up = document.createElement('button');
+    up.className = 'gray';
+    up.textContent = '↑';
+    up.onclick = function () { moveProduct(i, -1); };
+
+    var down = document.createElement('button');
+    down.className = 'gray';
+    down.textContent = '↓';
+    down.onclick = function () { moveProduct(i, 1); };
+
+    var del = document.createElement('button');
+    del.className = 'red';
+    del.textContent = 'حذف المنتج';
+    del.onclick = function () {
+      if (confirm('حذف المنتج رقم ' + p.id + '؟')) {
+        data.products.splice(i, 1);
+        renderProducts();
+      }
+    };
+
+    acts.appendChild(up);
+    acts.appendChild(down);
+    acts.appendChild(del);
+
+    el.appendChild(fields);
+    el.appendChild(catLabel);
+    el.appendChild(catSel);
+    el.appendChild(thumbs);
+    el.appendChild(acts);
+    el.appendChild(file);
+    box.appendChild(el);
+  });
+}
+
+function moveProduct(i, dir) {
+  var j = i + dir;
+  if (j < 0 || j >= data.products.length) { return; }
+  var t = data.products[i];
+  data.products[i] = data.products[j];
+  data.products[j] = t;
+  renderProducts();
+}
+
+$('addBtn').onclick = function () {
+  var max = 0;
+  data.products.forEach(function (p) { if (p.id > max) { max = p.id; } });
+  data.products.push({ id: max + 1, name: '', price: 0, category: '', images: [] });
+  renderProducts();
+  window.scrollTo(0, document.body.scrollHeight);
+};
+
+/* ---------- ضغط الصور ---------- */
+
+function compressImage(file) {
+  return new Promise(function (resolve, reject) {
+    var reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = function () {
+      var img = new Image();
+      img.onerror = reject;
+      img.onload = function () {
+        var max = 1000;
+        var w = img.width;
+        var h = img.height;
+        if (w > max || h > max) {
+          if (w >= h) { h = Math.round(h * max / w); w = max; }
+          else { w = Math.round(w * max / h); h = max; }
+        }
+        var c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        var url = c.toDataURL('image/jpeg', 0.85);
+        resolve({ dataUrl: url, b64: url.split(',')[1] });
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------- الواتساب ---------- */
+
+$('fWhatsapp').oninput = function () {
+  var n = normalizePhone($('fWhatsapp').value);
+  if (/^\d{11,15}$/.test(n)) {
+    setMsg($('waHint'), 'سيُحفظ كـ: ' + n, 'ok');
+  } else {
+    setMsg($('waHint'), 'الرقم غير مكتمل', 'err');
+  }
+};
+
+/* ---------- الرقم السري ---------- */
+
+$('pinBtn').onclick = async function () {
+  var m = $('pinMsg');
+  var oldH = await sha256($('pinOld').value.trim());
+  var n1 = $('pinNew').value.trim();
+  var n2 = $('pinNew2').value.trim();
+  if (oldH !== data.pinHash) { setMsg(m, 'الرقم السري الحالي غير صحيح', 'err'); return; }
+  if (n1.length < 4) { setMsg(m, 'الرقم الجديد قصير، لازم 4 أرقام فأكثر', 'err'); return; }
+  if (n1 !== n2) { setMsg(m, 'الرقمان غير متطابقين', 'err'); return; }
+  data.pinHash = await sha256(n1);
+  $('pinOld').value = '';
+  $('pinNew').value = '';
+  $('pinNew2').value = '';
+  setMsg(m, 'تم التغيير، اضغط "حفظ ونشر الموقع" لتثبيته', 'ok');
+};
+
+/* ---------- مفتاح النشر ---------- */
+
+$('tokenBtn').onclick = function () {
+  var t = $('tokenInput').value.trim();
+  if (!t) { setMsg($('tokenMsg'), 'الصق المفتاح أول', 'err'); return; }
+  try {
+    localStorage.setItem('gh_token', t);
+    $('tokenInput').value = '';
+    setMsg($('tokenMsg'), 'تم حفظ المفتاح على هذا الجهاز', 'ok');
+  } catch (e) {
+    setMsg($('tokenMsg'), 'المتصفح منع الحفظ، افتح اللوحة من متصفح عادي', 'err');
+  }
+};
+
+$('tokenDel').onclick = function () {
+  try { localStorage.removeItem('gh_token'); } catch (e) {}
+  setMsg($('tokenMsg'), 'تم حذف المفتاح من هذا الجهاز', 'ok');
+};
+
+/* ---------- الحفظ والنشر ---------- */
+
+function sleep(ms) { return new Promise(function (res) { setTimeout(res, ms); }); }
+
+/* يميّز بين مفتاح غير صحيح (401 أو 403 برسالة "Bad credentials"/صلاحيات)
+   وبين تحديد مؤقت من جتهاب بسبب كثرة الطلبات (403 مع ذكر "rate limit"),
+   والثاني يستاهل إعادة محاولة بدل اعتباره مفتاح خاطئ. */
+async function isRateLimit(res) {
+  try {
+    var j = await res.clone().json();
+    var msg = (j && j.message) ? j.message.toLowerCase() : '';
+    return msg.indexOf('rate limit') !== -1 || msg.indexOf('abuse') !== -1;
+  } catch (e) { return false; }
+}
+
+async function requestWithRetry(url, options) {
+  var attempts = 0;
+  while (true) {
+    attempts++;
+    var res = await fetch(url, options);
+    if (res.status === 403 && await isRateLimit(res) && attempts < 5) {
+      await sleep(attempts * 2500);
+      continue;
+    }
+    return res;
+  }
+}
+
+async function throwFor403(res) {
+  if (await isRateLimit(res)) { throw new Error('ratelimit'); }
+  throw new Error('auth');
+}
+
+async function putFile(path, b64, message) {
+  var sha;
+  var g = await requestWithRetry(ghUrl(path) + '?ref=' + BRANCH + '&t=' + Date.now(), { headers: ghHeaders() });
+  if (g.status === 200) { sha = (await g.json()).sha; }
+  else if (g.status === 401) { throw new Error('auth'); }
+  else if (g.status === 403) { await throwFor403(g); }
+  else if (g.status !== 404) { throw new Error('get ' + g.status); }
+
+  var body = { message: message, content: b64, branch: BRANCH };
+  if (sha) { body.sha = sha; }
+  var r = await requestWithRetry(ghUrl(path), {
+    method: 'PUT',
+    headers: ghHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(body)
+  });
+  if (r.status === 401) { throw new Error('auth'); }
+  if (r.status === 403) { await throwFor403(r); }
+  if (!r.ok) { throw new Error('put ' + r.status); }
+}
+
+$('saveBtn').onclick = async function () {
+  var m = $('saveMsg');
+  var btn = $('saveBtn');
+
+  data.title = $('fTitle').value.trim();
+  data.subtitle = $('fSubtitle').value.trim();
+  data.footer = $('fFooter').value.trim();
+  var phone = normalizePhone($('fWhatsapp').value);
+
+  if (!data.title) { setMsg(m, 'العنوان فاضي', 'err'); return; }
+  if (!/^\d{11,15}$/.test(phone)) { setMsg(m, 'رقم الواتساب غير صحيح', 'err'); return; }
+  data.whatsapp = phone;
+
+  var ids = {};
+  for (var i = 0; i < data.products.length; i++) {
+    var p = data.products[i];
+    if (!p.name.trim()) { setMsg(m, 'المنتج رقم ' + p.id + ' بدون اسم', 'err'); return; }
+    if (!p.images || !p.images.length) { setMsg(m, 'المنتج رقم ' + p.id + ' بدون صورة', 'err'); return; }
+    if (!p.id || ids[p.id]) { setMsg(m, 'الرقم ' + p.id + ' مكرر أو غير صحيح', 'err'); return; }
+    ids[p.id] = true;
+  }
+
+  if (!getToken()) {
+    setMsg(m, 'ما فيه مفتاح نشر على هذا الجهاز، أضفه من القسم الأخير', 'err');
+    $('tokenBox').open = true;
+    return;
+  }
+
+  btn.disabled = true;
+  try {
+    var used = {};
+    data.products.forEach(function (p) {
+      p.images.forEach(function (path) { used[path] = true; });
+    });
+    var names = Object.keys(pending).filter(function (n) { return used[n]; });
+
+    for (var k = 0; k < names.length; k++) {
+      setMsg(m, 'رفع الصورة ' + (k + 1) + ' من ' + names.length + '...', '');
+      await putFile(names[k], pending[names[k]], 'إضافة صورة منتج');
+      delete pending[names[k]];
+      if (k < names.length - 1) { await sleep(600); }
+    }
+
+    setMsg(m, 'حفظ البيانات...', '');
+    var clean = {
+      title: data.title,
+      subtitle: data.subtitle,
+      footer: data.footer,
+      whatsapp: data.whatsapp,
+      pinHash: data.pinHash,
+      categories: data.categories.slice(),
+      products: data.products.map(function (p) {
+        return { id: p.id, name: p.name.trim(), price: p.price, category: p.category || '', images: p.images.slice() };
+      })
+    };
+    await putFile('data.json', toB64(JSON.stringify(clean, null, 2)), 'تحديث بيانات الموقع');
+
+    setMsg(m, 'تم الحفظ. التغييرات تظهر للعملاء بعد دقيقة تقريباً', 'ok');
+  } catch (e) {
+    if (e.message === 'auth') {
+      setMsg(m, 'المفتاح غير صحيح أو ما عنده صلاحية الكتابة. أنشئ مفتاح جديد', 'err');
+      $('tokenBox').open = true;
+    } else if (e.message === 'ratelimit') {
+      setMsg(m, 'جيت هاب أوقف الطلبات مؤقتاً بسبب كثرتها. انتظر دقيقة واضغط "حفظ ونشر الموقع" مرة ثانية، الصور اللي رفعت لن تُرفع مرتين', 'err');
+    } else {
+      setMsg(m, 'فشل الحفظ (' + e.message + '). تأكد من الإنترنت وحاول مرة ثانية', 'err');
+    }
+  }
+  btn.disabled = false;
+};
+
+/* ---------- بداية الصفحة ---------- */
+
+$('loginBtn').onclick = login;
+$('pinInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { login(); } });
+loadPublic().then(function (d) { data = d; }).catch(function () {});
+</script>
+</body>
+</html>
