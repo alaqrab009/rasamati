@@ -718,6 +718,7 @@ $('saveBtn').onclick = async function () {
       title: data.title,
       subtitle: data.subtitle,
       footer: data.footer,
+      columns: data.columns === 1 ? 1 : 2,
       whatsapp: data.whatsapp,
       pinHash: data.pinHash,
       categories: data.categories.slice(),
