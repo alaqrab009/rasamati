@@ -83,6 +83,15 @@ input:focus, select:focus { outline: none; border-color: #c16329; box-shadow: 0 
   </div>
 
   <div class="box">
+    <h2>عدد الأعمال في الصف</h2>
+    <p class="hint">اختر طريقة عرض الصور في الموقع: صورتان في كل صف، أو صورة واحدة كبيرة في كل صف.</p>
+    <select id="fColumns">
+      <option value="2">صورتان في الصف</option>
+      <option value="1">صورة واحدة كبيرة في الصف</option>
+    </select>
+  </div>
+
+  <div class="box">
     <h2>رقم الواتساب لجميع المنتجات</h2>
     <label>الرقم بالصيغة الدولية، مثال: 966554645623</label>
     <input type="tel" id="fWhatsapp" inputmode="numeric">
@@ -263,6 +272,7 @@ function fillForm() {
   $('fSubtitle').value = data.subtitle;
   $('fFooter').value = data.footer;
   $('fWhatsapp').value = data.whatsapp;
+  $('fColumns').value = String(data.columns === 1 ? 1 : 2);
   renderCategories();
   renderProducts();
 }
@@ -666,6 +676,7 @@ $('saveBtn').onclick = async function () {
   data.title = $('fTitle').value.trim();
   data.subtitle = $('fSubtitle').value.trim();
   data.footer = $('fFooter').value.trim();
+  data.columns = parseInt($('fColumns').value, 10) === 1 ? 1 : 2;
   var phone = normalizePhone($('fWhatsapp').value);
 
   if (!data.title) { setMsg(m, 'العنوان فاضي', 'err'); return; }

@@ -482,6 +482,7 @@
       document.getElementById('siteSubtitle').textContent = DATA.subtitle;
       document.getElementById('siteFooter').textContent = DATA.footer;
       document.title = DATA.title;
+      grid.className = 'grid ' + (DATA.columns === 1 ? 'cols-1' : 'cols-2');
       buildTabs();
       render(currentList());
     }

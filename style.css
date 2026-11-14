@@ -682,3 +682,32 @@ footer {
     right: 8px;
   }
 }
+
+/* ---------- عدد الأعمال في الصف (من لوحة الإدارة) ---------- */
+
+.grid.cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid.cols-1 {
+  grid-template-columns: 1fr;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.grid.cols-1 .img-wrap {
+  height: 460px;
+}
+
+@media (max-width: 640px) {
+  .grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid.cols-1 {
+    grid-template-columns: 1fr;
+  }
+  .grid.cols-1 .img-wrap {
+    height: 380px;
+  }
+}
