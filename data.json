@@ -2,16 +2,63 @@
   "title": "رسماتي",
   "subtitle": "مرحبا بكم - يمكن الضغط على الواتس اسفل أي عمل تختاره للتنسيق والشراء",
   "footer": "جميع الحقوق محفوظة",
-  "columns": 2,
   "whatsapp": "966554645623",
   "pinHash": "217f7badc5615d5e40b71b9177cf9c15a1a61fa0c22de6bff18e18bece6dba0d",
   "categories": [],
   "products": [
-    { "id": 1, "name": "رسمة تجريبية 1", "price": 50, "category": "", "images": ["images/1.svg"] },
-    { "id": 2, "name": "رسمة تجريبية 2", "price": 50, "category": "", "images": ["images/2.svg"] },
-    { "id": 3, "name": "رسمة تجريبية 3", "price": 50, "category": "", "images": ["images/3.svg"] },
-    { "id": 4, "name": "رسمة تجريبية 4", "price": 50, "category": "", "images": ["images/4.svg"] },
-    { "id": 5, "name": "رسمة تجريبية 5", "price": 50, "category": "", "images": ["images/5.svg"] },
-    { "id": 6, "name": "رسمة تجريبية 6", "price": 50, "category": "", "images": ["images/6.svg"] }
+    {
+      "id": 1,
+      "name": "رسمة تجريبية 1",
+      "price": 50,
+      "category": "",
+      "images": [
+        "images/1.svg"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "رسمة تجريبية 2",
+      "price": 50,
+      "category": "",
+      "images": [
+        "images/2.svg"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "رسمة تجريبية 3",
+      "price": 50,
+      "category": "",
+      "images": [
+        "images/3.svg"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "رسمة تجريبية 4",
+      "price": 50,
+      "category": "",
+      "images": [
+        "images/4.svg"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "رسمة تجريبية 5",
+      "price": 50,
+      "category": "",
+      "images": [
+        "images/5.svg"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "رسمة تجريبية 6",
+      "price": 50,
+      "category": "",
+      "images": [
+        "images/6.svg"
+      ]
+    }
   ]
 }
