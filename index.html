@@ -255,6 +255,7 @@
       var imageUrl = imgs.length ? (siteBase() + imgs[0]) : '';
       var msg = 'السلام عليكم، أبغى أطلب المنتج رقم ' + p.id + '\n' +
                 'الاسم: ' + p.name + '\n' +
+                (p.size ? 'المقاس: ' + p.size + '\n' : '') +
                 'السعر: ' + p.price + ' ريال' +
                 (imageUrl ? '\nرابط الصورة: ' + imageUrl : '');
       return 'https://wa.me/' + DATA.whatsapp + '?text=' + encodeURIComponent(msg);
@@ -454,12 +455,25 @@
         badge.className = 'badge';
         badge.textContent = p.id;
 
-        var h3 = document.createElement('h3');
-        h3.textContent = p.name;
-
-        var price = document.createElement('p');
-        price.className = 'price';
-        price.textContent = p.price + ' ريال';
+        var info = document.createElement('div');
+        info.className = 'info';
+        function addRow(label, value, cls) {
+          var row = document.createElement('p');
+          row.className = 'info-row' + (cls ? ' ' + cls : '');
+          var l = document.createElement('span');
+          l.className = 'info-label';
+          l.textContent = label + ': ';
+          var v = document.createElement('span');
+          v.className = 'info-value';
+          v.textContent = value;
+          row.appendChild(l);
+          row.appendChild(v);
+          info.appendChild(row);
+        }
+        addRow('اسم العمل', p.name);
+        if (p.size) { addRow('المقاس', p.size); }
+        if (p.description) { addRow('وصف المنتج', p.description, 'info-desc'); }
+        addRow('السعر', p.price + ' ريال', 'info-price');
 
         var btn = document.createElement('a');
         btn.className = 'wa-btn';
@@ -470,8 +484,7 @@
 
         card.appendChild(badge);
         card.appendChild(buildCarousel(p));
-        card.appendChild(h3);
-        card.appendChild(price);
+        card.appendChild(info);
         card.appendChild(btn);
         grid.appendChild(card);
       });

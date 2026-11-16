@@ -401,6 +401,23 @@ function renderProducts() {
     fields.appendChild(nameIn);
     fields.appendChild(priceIn);
 
+    var sizeLabel = document.createElement('label');
+    sizeLabel.textContent = 'المقاس';
+    var sizeIn = document.createElement('input');
+    sizeIn.type = 'text';
+    sizeIn.value = p.size || '';
+    sizeIn.placeholder = 'مثال: 50 × 70 سم';
+    sizeIn.oninput = function () { p.size = sizeIn.value; };
+
+    var descLabel = document.createElement('label');
+    descLabel.textContent = 'وصف المنتج';
+    var descIn = document.createElement('textarea');
+    descIn.rows = 3;
+    descIn.value = p.description || '';
+    descIn.placeholder = 'اكتب وصف العمل هنا';
+    descIn.style.cssText = 'width:100%;padding:11px;font-size:15px;border:1px solid #cfc7bb;border-radius:8px;font-family:inherit;color:#3e2a1e;resize:vertical;';
+    descIn.oninput = function () { p.description = descIn.value; };
+
     var catLabel = document.createElement('label');
     catLabel.textContent = 'القسم';
     var catSel = document.createElement('select');
@@ -510,6 +527,10 @@ function renderProducts() {
     acts.appendChild(del);
 
     el.appendChild(fields);
+    el.appendChild(sizeLabel);
+    el.appendChild(sizeIn);
+    el.appendChild(descLabel);
+    el.appendChild(descIn);
     el.appendChild(catLabel);
     el.appendChild(catSel);
     el.appendChild(thumbs);
@@ -723,7 +744,7 @@ $('saveBtn').onclick = async function () {
       pinHash: data.pinHash,
       categories: data.categories.slice(),
       products: data.products.map(function (p) {
-        return { id: p.id, name: p.name.trim(), price: p.price, category: p.category || '', images: p.images.slice() };
+        return { id: p.id, name: p.name.trim(), price: p.price, category: p.category || '', size: (p.size || '').trim(), description: (p.description || '').trim(), images: p.images.slice() };
       })
     };
     await putFile('data.json', toB64(JSON.stringify(clean, null, 2)), 'تحديث بيانات الموقع');

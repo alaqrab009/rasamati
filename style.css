@@ -325,7 +325,7 @@ main {
   text-align: center;
   cursor: pointer;
   z-index: 3;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.2s, background 0.2s;
 }
 
@@ -709,5 +709,47 @@ footer {
   }
   .grid.cols-1 .img-wrap {
     height: 380px;
+  }
+}
+
+/* ---------- معلومات العمل أسفل الصورة ---------- */
+
+.card .info {
+  text-align: right;
+  padding: 14px 16px 6px;
+}
+
+.info-row {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.info-label {
+  font-weight: 800;
+  color: var(--oud);
+}
+
+.info-desc .info-value {
+  white-space: pre-line;
+}
+
+.info-price .info-value {
+  color: var(--label);
+  font-weight: 800;
+  font-size: 17px;
+}
+
+@media (max-width: 640px) {
+  .card .info {
+    padding: 10px 10px 4px;
+  }
+  .info-row {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .info-price .info-value {
+    font-size: 14px;
   }
 }
