@@ -21,7 +21,11 @@ button.red { background: #b3392f; }
 button.gold { background: #c99749; }
 .row { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
 .product { border: 1px solid #e3ddd2; border-radius: 10px; padding: 10px; margin-top: 12px; }
-.product .fields { display: grid; grid-template-columns: 70px 1fr 90px; gap: 8px; }
+.product .fields { display: grid; grid-template-columns: 70px 1fr; gap: 8px; }
+.detail { border: 1px solid #e3ddd2; border-radius: 10px; padding: 10px; margin-top: 10px; background: #fcfaf6; }
+.detail .dhead { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #9c4517; }
+.detail .dhead img { width: 54px; height: 54px; object-fit: cover; border-radius: 8px; }
+.detail textarea { width: 100%; padding: 11px; font-size: 15px; border: 1px solid #cfc7bb; border-radius: 8px; font-family: inherit; color: #3e2a1e; resize: vertical; }
 .product .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
 .thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 .thumb { position: relative; width: 74px; height: 74px; border-radius: 8px; overflow: hidden; background: #eee; border: 1px solid #e3ddd2; }
@@ -46,7 +50,7 @@ details summary { cursor: pointer; font-weight: bold; color: #9c4517; }
 ol { margin: 10px 20px 0 0; line-height: 2; font-size: 14px; }
 a { color: #25406b; }
 @media (max-width: 520px) {
-  .product .fields { grid-template-columns: 60px 1fr 80px; }
+  .product .fields { grid-template-columns: 60px 1fr; }
   .thumb, .thumb.add { width: 64px; height: 64px; }
 }
 input:focus, select:focus { outline: none; border-color: #c16329; box-shadow: 0 0 0 3px rgba(193,99,41,0.18); }
@@ -388,35 +392,11 @@ function renderProducts() {
     var nameIn = document.createElement('input');
     nameIn.type = 'text';
     nameIn.value = p.name;
-    nameIn.placeholder = 'اسم المنتج';
+    nameIn.placeholder = 'اسم المنتج (يظهر إن لم تكتب اسماً للصورة)';
     nameIn.oninput = function () { p.name = nameIn.value; };
-
-    var priceIn = document.createElement('input');
-    priceIn.type = 'number';
-    priceIn.value = p.price;
-    priceIn.placeholder = 'السعر';
-    priceIn.oninput = function () { p.price = parseFloat(priceIn.value) || 0; };
 
     fields.appendChild(idIn);
     fields.appendChild(nameIn);
-    fields.appendChild(priceIn);
-
-    var sizeLabel = document.createElement('label');
-    sizeLabel.textContent = 'المقاس';
-    var sizeIn = document.createElement('input');
-    sizeIn.type = 'text';
-    sizeIn.value = p.size || '';
-    sizeIn.placeholder = 'مثال: 50 × 70 سم';
-    sizeIn.oninput = function () { p.size = sizeIn.value; };
-
-    var descLabel = document.createElement('label');
-    descLabel.textContent = 'وصف المنتج';
-    var descIn = document.createElement('textarea');
-    descIn.rows = 3;
-    descIn.value = p.description || '';
-    descIn.placeholder = 'اكتب وصف العمل هنا';
-    descIn.style.cssText = 'width:100%;padding:11px;font-size:15px;border:1px solid #cfc7bb;border-radius:8px;font-family:inherit;color:#3e2a1e;resize:vertical;';
-    descIn.oninput = function () { p.description = descIn.value; };
 
     var catLabel = document.createElement('label');
     catLabel.textContent = 'القسم';
@@ -436,6 +416,66 @@ function renderProducts() {
 
     var thumbs = document.createElement('div');
     thumbs.className = 'thumbs';
+
+    var detailsBox = document.createElement('div');
+
+    function syncDetails() {
+      if (!Array.isArray(p.details)) { p.details = []; }
+      while (p.details.length < p.images.length) { p.details.push({ name: '', size: '', description: '' }); }
+      if (p.details.length > p.images.length) { p.details.length = p.images.length; }
+    }
+
+    function renderDetails() {
+      detailsBox.innerHTML = '';
+      syncDetails();
+      p.images.forEach(function (path, idx) {
+        var d = p.details[idx];
+        var box = document.createElement('div');
+        box.className = 'detail';
+
+        var head = document.createElement('div');
+        head.className = 'dhead';
+        var pim = document.createElement('img');
+        pim.src = imgSrc(path);
+        var ht = document.createElement('span');
+        ht.textContent = 'تفاصيل الصورة ' + (idx + 1);
+        head.appendChild(pim);
+        head.appendChild(ht);
+        box.appendChild(head);
+
+        var l1 = document.createElement('label');
+        l1.textContent = 'اسم العمل';
+        var in1 = document.createElement('input');
+        in1.type = 'text';
+        in1.value = d.name || '';
+        in1.placeholder = p.name || 'اسم العمل';
+        in1.oninput = function () { d.name = in1.value; };
+
+        var l2 = document.createElement('label');
+        l2.textContent = 'المقاس';
+        var in2 = document.createElement('input');
+        in2.type = 'text';
+        in2.value = d.size || '';
+        in2.placeholder = 'مثال: 50 × 70 سم';
+        in2.oninput = function () { d.size = in2.value; };
+
+        var l3 = document.createElement('label');
+        l3.textContent = 'وصف المنتج';
+        var in3 = document.createElement('textarea');
+        in3.rows = 3;
+        in3.value = d.description || '';
+        in3.placeholder = 'اكتب وصف العمل هنا';
+        in3.oninput = function () { d.description = in3.value; };
+
+        box.appendChild(l1);
+        box.appendChild(in1);
+        box.appendChild(l2);
+        box.appendChild(in2);
+        box.appendChild(l3);
+        box.appendChild(in3);
+        detailsBox.appendChild(box);
+      });
+    }
 
     function renderThumbs() {
       thumbs.innerHTML = '';
@@ -458,6 +498,7 @@ function renderProducts() {
         rm.textContent = '×';
         rm.onclick = function () {
           p.images.splice(idx, 1);
+          if (Array.isArray(p.details)) { p.details.splice(idx, 1); }
           renderThumbs();
         };
         t.appendChild(rm);
@@ -472,6 +513,7 @@ function renderProducts() {
         addT.onclick = function () { file.click(); };
         thumbs.appendChild(addT);
       }
+      renderDetails();
     }
 
     var file = document.createElement('input');
@@ -527,13 +569,10 @@ function renderProducts() {
     acts.appendChild(del);
 
     el.appendChild(fields);
-    el.appendChild(sizeLabel);
-    el.appendChild(sizeIn);
-    el.appendChild(descLabel);
-    el.appendChild(descIn);
     el.appendChild(catLabel);
     el.appendChild(catSel);
     el.appendChild(thumbs);
+    el.appendChild(detailsBox);
     el.appendChild(acts);
     el.appendChild(file);
     box.appendChild(el);
@@ -552,7 +591,7 @@ function moveProduct(i, dir) {
 $('addBtn').onclick = function () {
   var max = 0;
   data.products.forEach(function (p) { if (p.id > max) { max = p.id; } });
-  data.products.push({ id: max + 1, name: '', price: 0, category: '', images: [] });
+  data.products.push({ id: max + 1, name: '', category: '', images: [], details: [] });
   renderProducts();
   window.scrollTo(0, document.body.scrollHeight);
 };
@@ -744,7 +783,11 @@ $('saveBtn').onclick = async function () {
       pinHash: data.pinHash,
       categories: data.categories.slice(),
       products: data.products.map(function (p) {
-        return { id: p.id, name: p.name.trim(), price: p.price, category: p.category || '', size: (p.size || '').trim(), description: (p.description || '').trim(), images: p.images.slice() };
+        var det = (Array.isArray(p.details) ? p.details : []).slice(0, p.images.length).map(function (d) {
+          return { name: (d.name || '').trim(), size: (d.size || '').trim(), description: (d.description || '').trim() };
+        });
+        while (det.length < p.images.length) { det.push({ name: '', size: '', description: '' }); }
+        return { id: p.id, name: p.name.trim(), category: p.category || '', images: p.images.slice(), details: det };
       })
     };
     await putFile('data.json', toB64(JSON.stringify(clean, null, 2)), 'تحديث بيانات الموقع');

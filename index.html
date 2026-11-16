@@ -69,6 +69,11 @@
       return u.substring(0, u.lastIndexOf('/') + 1);
     }
 
+    function imageDetails(p, idx) {
+      var d = (p.details && p.details[idx]) || {};
+      return { name: d.name || p.name || '', size: d.size || '', description: d.description || '' };
+    }
+
     function productImages(p) {
       if (p.images && p.images.length) { return p.images; }
       if (p.image) { return [p.image]; }
@@ -250,18 +255,18 @@
     lb.stage.addEventListener('pointerup', pointerEnd);
     lb.stage.addEventListener('pointercancel', pointerEnd);
 
-    function buildWhatsappLink(p) {
+    function buildWhatsappLink(p, idx) {
       var imgs = productImages(p);
-      var imageUrl = imgs.length ? (siteBase() + imgs[0]) : '';
+      var d = imageDetails(p, idx || 0);
+      var imageUrl = imgs.length ? (siteBase() + imgs[idx || 0]) : '';
       var msg = 'السلام عليكم، أبغى أطلب المنتج رقم ' + p.id + '\n' +
-                'الاسم: ' + p.name + '\n' +
-                (p.size ? 'المقاس: ' + p.size + '\n' : '') +
-                'السعر: ' + p.price + ' ريال' +
+                'الاسم: ' + d.name +
+                (d.size ? '\nالمقاس: ' + d.size : '') +
                 (imageUrl ? '\nرابط الصورة: ' + imageUrl : '');
       return 'https://wa.me/' + DATA.whatsapp + '?text=' + encodeURIComponent(msg);
     }
 
-    function buildCarousel(p) {
+    function buildCarousel(p, onChange) {
       var imgs = productImages(p);
       var wrap = document.createElement('div');
       wrap.className = 'img-wrap';
@@ -271,7 +276,7 @@
       imgs.forEach(function (src, i) {
         var img = document.createElement('img');
         img.src = src;
-        img.alt = p.name;
+        img.alt = imageDetails(p, i).name;
         img.draggable = false;
         img.onclick = function (e) {
           e.stopPropagation();
@@ -291,6 +296,7 @@
             d.classList.toggle('active', i === current);
           });
         }
+        if (onChange) { onChange(current); }
       }
 
       function go(i) {
@@ -367,7 +373,12 @@
       var q = searchInput.value.trim().toLowerCase();
       if (q) {
         list = list.filter(function (p) {
-          return String(p.id).indexOf(q) !== -1 || p.name.toLowerCase().indexOf(q) !== -1;
+          if (String(p.id).indexOf(q) !== -1 || p.name.toLowerCase().indexOf(q) !== -1) { return true; }
+          var imgsN = productImages(p);
+          for (var k = 0; k < imgsN.length; k++) {
+            if (imageDetails(p, k).name.toLowerCase().indexOf(q) !== -1) { return true; }
+          }
+          return false;
         });
       }
       return list;
@@ -470,20 +481,26 @@
           row.appendChild(v);
           info.appendChild(row);
         }
-        addRow('اسم العمل', p.name);
-        if (p.size) { addRow('المقاس', p.size); }
-        if (p.description) { addRow('وصف المنتج', p.description, 'info-desc'); }
-        addRow('السعر', p.price + ' ريال', 'info-price');
 
         var btn = document.createElement('a');
         btn.className = 'wa-btn';
         btn.target = '_blank';
         btn.rel = 'noopener';
-        btn.href = buildWhatsappLink(p);
         btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 1 1-4.2 15.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.800zm-3.500 3.900c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.300s1 2.700 1.200 2.900c.1.2 2 3.100 4.900 4.300 2.400 1 2.900.8 3.400.7.5 0 1.700-.7 1.900-1.300.2-.700.2-1.200.2-1.300-.1-.1-.3-.2-.6-.4l-2-1c-.3-.1-.5-.1-.7.2l-.9 1.100c-.2.2-.3.2-.6.1a6.700 6.700 0 0 1-3.300-2.900c-.2-.4.2-.4.7-1.300.1-.2 0-.3 0-.5l-.9-2.200c-.2-.5-.4-.5-.6-.5h-.5z"/></svg><span>اطلب عبر واتساب</span>';
 
+        function showInfo(idx) {
+          var d = imageDetails(p, idx);
+          info.innerHTML = '';
+          addRow('اسم العمل', d.name);
+          if (d.size) { addRow('المقاس', d.size); }
+          if (d.description) { addRow('وصف المنتج', d.description, 'info-desc'); }
+          btn.href = buildWhatsappLink(p, idx);
+        }
+
+        var carousel = buildCarousel(p, showInfo);
+
         card.appendChild(badge);
-        card.appendChild(buildCarousel(p));
+        card.appendChild(carousel);
         card.appendChild(info);
         card.appendChild(btn);
         grid.appendChild(card);
