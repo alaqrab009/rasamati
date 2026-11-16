@@ -5,97 +5,242 @@
   "columns": 1,
   "whatsapp": "966508839625",
   "pinHash": "217f7badc5615d5e40b71b9177cf9c15a1a61fa0c22de6bff18e18bece6dba0d",
-  "categories": [],
+  "categories": [
+    "منبع الفخر ١"
+  ],
   "products": [
     {
       "id": 1,
       "name": "منبع الفخر",
-      "price": 50,
-      "category": "",
+      "category": "منبع الفخر ١",
       "images": [
         "images/p1794822309698_0.jpg",
         "images/p1794822350274_0.jpg",
         "images/p1794822742342_0.jpg",
         "images/p1794822753844_0.jpg"
+      ],
+      "details": [
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        }
       ]
     },
     {
       "id": 2,
       "name": "تراثيات",
-      "price": 50,
       "category": "",
       "images": [
         "images/p1794822425112_0.jpg",
         "images/p1794822436297_0.jpg",
         "images/p1794822454825_0.jpg",
         "images/p1794822485228_0.jpg"
+      ],
+      "details": [
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        }
       ]
     },
     {
       "id": 3,
       "name": "أساس ثقافتنا ( الخيل - و الابل - الصقر)",
-      "price": 50,
       "category": "",
       "images": [
         "images/p1794822537287_0.jpg",
         "images/p1794822543624_0.jpg",
         "images/p1794822567569_0.jpg",
         "images/p1794822602503_0.jpg"
+      ],
+      "details": [
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        }
       ]
     },
     {
       "id": 4,
       "name": "فراشات",
-      "price": 50,
       "category": "",
       "images": [
         "images/p1794822831478_0.jpg",
         "images/p1794822840692_0.jpg",
         "images/p1794822846303_0.jpg"
+      ],
+      "details": [
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        }
       ]
     },
     {
       "id": 5,
       "name": "قوارب",
-      "price": 50,
       "category": "",
       "images": [
         "images/p1794822889631_0.jpg",
         "images/p1794822894206_0.jpg",
         "images/p1794822898709_0.jpg"
+      ],
+      "details": [
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        }
       ]
     },
     {
       "id": 6,
       "name": "مشروبات",
-      "price": 50,
       "category": "",
       "images": [
         "images/p1794822921960_0.jpg",
         "images/p1794822930484_0.jpg",
         "images/p1794822934722_0.jpg"
+      ],
+      "details": [
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        }
       ]
     },
     {
       "id": 7,
       "name": "تايقر",
-      "price": 0,
       "category": "",
       "images": [
         "images/p1794822984811_0.jpg",
         "images/p1794822989832_0.jpg",
         "images/p1794822998243_0.jpg"
+      ],
+      "details": [
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        }
       ]
     },
     {
       "id": 8,
       "name": "انمي",
-      "price": 0,
       "category": "",
       "images": [
         "images/p1794823062652_0.jpg",
         "images/p1794823615093_0.jpg",
         "images/p1794823647930_0.jpg"
+      ],
+      "details": [
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        },
+        {
+          "name": "",
+          "size": "",
+          "description": ""
+        }
       ]
     }
   ]
