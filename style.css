@@ -774,3 +774,24 @@ footer {
 @keyframes img-spin {
   to { transform: rotate(360deg); }
 }
+
+/* ---------- الصورة الرئيسية في الإطار ---------- */
+
+.main-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+  cursor: zoom-in;
+}
+
+.main-img.fade {
+  animation: img-fade 0.25s ease;
+}
+
+@keyframes img-fade {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}

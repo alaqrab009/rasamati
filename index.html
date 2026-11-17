@@ -268,25 +268,15 @@
 
     var bgItems = [];
     var bgToken = 0;
+    var warmed = {};
+    var warmRefs = [];
 
-    function attachRetry(el) {
-      if (el._retryBound) { return; }
-      el._retryBound = true;
-      el.addEventListener('error', function () {
-        if (el._retried) { return; }
-        el._retried = true;
-        var base = el.getAttribute('data-src') || el.getAttribute('src');
-        setTimeout(function () { el.src = base + (base.indexOf('?') === -1 ? '?r=1' : '&r=1'); }, 800);
-      });
-    }
-
-    function ensureLoaded(el, urgent) {
-      if (!el) { return; }
-      attachRetry(el);
-      if (!el.getAttribute('src')) {
-        if (urgent) { el.fetchPriority = 'high'; }
-        el.src = el.getAttribute('data-src');
-      }
+    function warm(src, cb) {
+      var im = new Image();
+      warmRefs.push(im);
+      im.onload = function () { warmed[src] = true; if (cb) { cb(); } };
+      im.onerror = function () { if (cb) { cb(); } };
+      im.src = src;
     }
 
     function startBackgroundLoading(token) {
@@ -297,14 +287,10 @@
       function next() {
         if (token !== bgToken) { return; }
         while (active < MAX_PARALLEL && pos < items.length) {
-          var el = items[pos++].el;
-          if (el.getAttribute('src')) { continue; }
+          var src = items[pos++].src;
+          if (warmed[src]) { continue; }
           active++;
-          var done = function () { active--; next(); };
-          attachRetry(el);
-          el.addEventListener('load', done, { once: true });
-          el.addEventListener('error', done, { once: true });
-          el.src = el.getAttribute('data-src');
+          warm(src, function () { active--; next(); });
         }
       }
       next();
@@ -315,28 +301,12 @@
       var wrap = document.createElement('div');
       wrap.className = 'img-wrap';
 
-      var track = document.createElement('div');
-      track.className = 'img-track';
-      var imgEls = [];
-      imgs.forEach(function (src, i) {
-        var img = document.createElement('img');
-        img.decoding = 'async';
-        if (i === 0) {
-          img.src = src;
-        } else {
-          img.setAttribute('data-src', src);
-          bgItems.push({ el: img, idx: i, order: bgItems.length });
-        }
-        img.alt = imageDetails(p, i).name;
-        img.draggable = false;
-        img.onclick = function (e) {
-          e.stopPropagation();
-          openLightbox(imgs, i);
-        };
-        track.appendChild(img);
-        imgEls.push(img);
-      });
-      wrap.appendChild(track);
+      var main = document.createElement('img');
+      main.className = 'main-img';
+      main.decoding = 'async';
+      main.draggable = false;
+      main.addEventListener('load', function () { warmed[main.getAttribute('src')] = true; });
+      wrap.appendChild(main);
 
       var spinner = document.createElement('div');
       spinner.className = 'img-spinner';
@@ -344,73 +314,93 @@
       wrap.appendChild(spinner);
 
       var current = 0;
+      var req = 0;
+      var dots = null;
+      var countBadge = null;
 
-      function refreshSpinner() {
-        var el = imgEls[current];
-        var ready = el && el.complete && el.naturalWidth > 0;
-        spinner.style.display = (el && !ready) ? 'block' : 'none';
-      }
-
-      imgEls.forEach(function (el) {
-        el.addEventListener('load', refreshSpinner);
-        el.addEventListener('error', refreshSpinner);
+      imgs.forEach(function (src, i) {
+        if (i > 0) { bgItems.push({ src: src, idx: i, order: bgItems.length }); }
       });
 
-      function ensureAt(k, urgent) {
-        if (imgEls.length) { ensureLoaded(imgEls[(k + imgEls.length) % imgEls.length], urgent); }
-      }
+      main.onclick = function (e) {
+        e.stopPropagation();
+        if (imgs.length) { openLightbox(imgs, current); }
+      };
 
-      function update(animate) {
-        ensureAt(current, true);
-        if (animate) {
-          ensureAt(current + 1);
-          ensureAt(current - 1);
-        }
-        refreshSpinner();
-        track.style.transition = animate ? 'transform 0.35s ease' : 'none';
-        track.style.transform = 'translateX(' + (current * 100) + '%)';
+      function applyUi() {
         if (dots) {
-          Array.prototype.forEach.call(dots.children, function (d, i) {
-            d.classList.toggle('active', i === current);
+          Array.prototype.forEach.call(dots.children, function (d, k) {
+            d.classList.toggle('active', k === current);
           });
         }
+        if (countBadge) { countBadge.textContent = (current + 1) + '/' + imgs.length; }
+        main.alt = imageDetails(p, current).name;
         if (onChange) { onChange(current); }
       }
 
-      function go(i) {
-        if (imgs.length === 0) { return; }
-        current = (i + imgs.length) % imgs.length;
-        update(true);
+      function fade() {
+        main.classList.remove('fade');
+        void main.offsetWidth;
+        main.classList.add('fade');
       }
 
-      var dots = null;
+      function show(i) {
+        if (imgs.length === 0) { return; }
+        current = (i + imgs.length) % imgs.length;
+        var src = imgs[current];
+        var my = ++req;
+        applyUi();
+        if (warmed[src]) {
+          main.src = src;
+          spinner.style.display = 'none';
+          fade();
+        } else {
+          spinner.style.display = 'block';
+          var tries = 0;
+          (function attempt() {
+            warm(src, function () {
+              if (my !== req) { return; }
+              if (!warmed[src] && tries < 1) { tries++; setTimeout(attempt, 600); return; }
+              main.src = src;
+              spinner.style.display = 'none';
+              fade();
+            });
+          })();
+        }
+        [current + 1, current - 1].forEach(function (k) {
+          var s = imgs[(k + imgs.length) % imgs.length];
+          if (!warmed[s]) { warm(s); }
+        });
+      }
+
+      if (imgs.length) { main.src = imgs[0]; }
+
       if (imgs.length > 1) {
         var prevBtn = document.createElement('button');
         prevBtn.type = 'button';
         prevBtn.className = 'nav-btn prev';
         prevBtn.innerHTML = '&#10094;';
         prevBtn.setAttribute('aria-label', 'الصورة السابقة');
-        prevBtn.onclick = function (e) { e.stopPropagation(); go(current - 1); };
+        prevBtn.onclick = function (e) { e.stopPropagation(); show(current - 1); };
 
         var nextBtn = document.createElement('button');
         nextBtn.type = 'button';
         nextBtn.className = 'nav-btn next';
         nextBtn.innerHTML = '&#10095;';
         nextBtn.setAttribute('aria-label', 'الصورة التالية');
-        nextBtn.onclick = function (e) { e.stopPropagation(); go(current + 1); };
+        nextBtn.onclick = function (e) { e.stopPropagation(); show(current + 1); };
 
         dots = document.createElement('div');
         dots.className = 'dots';
-        imgs.forEach(function (_, i) {
+        imgs.forEach(function (_, k) {
           var d = document.createElement('span');
-          d.className = 'dot' + (i === 0 ? ' active' : '');
-          d.onclick = function (e) { e.stopPropagation(); go(i); };
+          d.className = 'dot' + (k === 0 ? ' active' : '');
+          d.onclick = function (e) { e.stopPropagation(); show(k); };
           dots.appendChild(d);
         });
 
-        var countBadge = document.createElement('span');
+        countBadge = document.createElement('span');
         countBadge.className = 'count-badge';
-        countBadge.textContent = '1/' + imgs.length;
 
         wrap.appendChild(prevBtn);
         wrap.appendChild(nextBtn);
@@ -425,19 +415,13 @@
           if (startX === null) { return; }
           var diff = e.changedTouches[0].clientX - startX;
           if (Math.abs(diff) > 40) {
-            if (diff > 0) { go(current - 1); } else { go(current + 1); }
+            if (diff > 0) { show(current - 1); } else { show(current + 1); }
           }
           startX = null;
         });
-
-        var origUpdate = update;
-        update = function (animate) {
-          origUpdate(animate);
-          countBadge.textContent = (current + 1) + '/' + imgs.length;
-        };
       }
 
-      update(false);
+      applyUi();
       return wrap;
     }
 
