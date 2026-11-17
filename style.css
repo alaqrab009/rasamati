@@ -314,14 +314,14 @@ main {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: none;
-  background: rgba(61, 11, 23, 0.55);
+  background: rgba(61, 11, 23, 0.6);
   color: #fff;
-  font-size: 13px;
-  line-height: 32px;
+  font-size: 22px;
+  line-height: 52px;
   text-align: center;
   cursor: pointer;
   z-index: 3;
@@ -338,11 +338,11 @@ main {
 }
 
 .nav-btn.prev {
-  left: 8px;
+  left: 10px;
 }
 
 .nav-btn.next {
-  right: 8px;
+  right: 10px;
 }
 
 .dots {
@@ -624,10 +624,10 @@ footer {
   }
   .nav-btn {
     opacity: 1;
-    width: 26px;
-    height: 26px;
-    font-size: 11px;
-    line-height: 26px;
+    width: 44px;
+    height: 44px;
+    font-size: 19px;
+    line-height: 44px;
   }
   .lb-nav {
     width: 38px;
