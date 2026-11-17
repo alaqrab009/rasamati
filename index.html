@@ -266,6 +266,33 @@
       return 'https://wa.me/' + DATA.whatsapp + '?text=' + encodeURIComponent(msg);
     }
 
+    var bgItems = [];
+    var bgToken = 0;
+
+    function ensureLoaded(el) {
+      if (el && !el.getAttribute('src')) { el.src = el.getAttribute('data-src'); }
+    }
+
+    function startBackgroundLoading(token) {
+      var items = bgItems.slice().sort(function (a, b) { return a.idx - b.idx || a.order - b.order; });
+      var pos = 0;
+      var active = 0;
+      var MAX_PARALLEL = 2;
+      function next() {
+        if (token !== bgToken) { return; }
+        while (active < MAX_PARALLEL && pos < items.length) {
+          var el = items[pos++].el;
+          if (el.getAttribute('src')) { continue; }
+          active++;
+          var done = function () { active--; next(); };
+          el.addEventListener('load', done, { once: true });
+          el.addEventListener('error', done, { once: true });
+          el.src = el.getAttribute('data-src');
+        }
+      }
+      next();
+    }
+
     function buildCarousel(p, onChange) {
       var imgs = productImages(p);
       var wrap = document.createElement('div');
@@ -273,9 +300,16 @@
 
       var track = document.createElement('div');
       track.className = 'img-track';
+      var imgEls = [];
       imgs.forEach(function (src, i) {
         var img = document.createElement('img');
-        img.src = src;
+        img.decoding = 'async';
+        if (i === 0) {
+          img.src = src;
+        } else {
+          img.setAttribute('data-src', src);
+          bgItems.push({ el: img, idx: i, order: bgItems.length });
+        }
         img.alt = imageDetails(p, i).name;
         img.draggable = false;
         img.onclick = function (e) {
@@ -283,12 +317,22 @@
           openLightbox(imgs, i);
         };
         track.appendChild(img);
+        imgEls.push(img);
       });
       wrap.appendChild(track);
 
       var current = 0;
 
+      function ensureAt(k) {
+        if (imgEls.length) { ensureLoaded(imgEls[(k + imgEls.length) % imgEls.length]); }
+      }
+
       function update(animate) {
+        ensureAt(current);
+        if (animate) {
+          ensureAt(current + 1);
+          ensureAt(current - 1);
+        }
         track.style.transition = animate ? 'transform 0.35s ease' : 'none';
         track.style.transform = 'translateX(' + (current * 100) + '%)';
         if (dots) {
@@ -453,6 +497,8 @@
 
     function render(list) {
       grid.innerHTML = '';
+      bgToken++;
+      bgItems = [];
       if (list.length === 0) {
         emptyMsg.style.display = 'block';
         return;
@@ -505,6 +551,8 @@
         card.appendChild(btn);
         grid.appendChild(card);
       });
+      var tk = bgToken;
+      setTimeout(function () { startBackgroundLoading(tk); }, 500);
     }
 
     function applyData() {
