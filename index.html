@@ -269,15 +269,31 @@
     var bgItems = [];
     var bgToken = 0;
 
-    function ensureLoaded(el) {
-      if (el && !el.getAttribute('src')) { el.src = el.getAttribute('data-src'); }
+    function attachRetry(el) {
+      if (el._retryBound) { return; }
+      el._retryBound = true;
+      el.addEventListener('error', function () {
+        if (el._retried) { return; }
+        el._retried = true;
+        var base = el.getAttribute('data-src') || el.getAttribute('src');
+        setTimeout(function () { el.src = base + (base.indexOf('?') === -1 ? '?r=1' : '&r=1'); }, 800);
+      });
+    }
+
+    function ensureLoaded(el, urgent) {
+      if (!el) { return; }
+      attachRetry(el);
+      if (!el.getAttribute('src')) {
+        if (urgent) { el.fetchPriority = 'high'; }
+        el.src = el.getAttribute('data-src');
+      }
     }
 
     function startBackgroundLoading(token) {
       var items = bgItems.slice().sort(function (a, b) { return a.idx - b.idx || a.order - b.order; });
       var pos = 0;
       var active = 0;
-      var MAX_PARALLEL = 2;
+      var MAX_PARALLEL = 3;
       function next() {
         if (token !== bgToken) { return; }
         while (active < MAX_PARALLEL && pos < items.length) {
@@ -285,6 +301,7 @@
           if (el.getAttribute('src')) { continue; }
           active++;
           var done = function () { active--; next(); };
+          attachRetry(el);
           el.addEventListener('load', done, { once: true });
           el.addEventListener('error', done, { once: true });
           el.src = el.getAttribute('data-src');
@@ -321,18 +338,35 @@
       });
       wrap.appendChild(track);
 
+      var spinner = document.createElement('div');
+      spinner.className = 'img-spinner';
+      spinner.style.display = 'none';
+      wrap.appendChild(spinner);
+
       var current = 0;
 
-      function ensureAt(k) {
-        if (imgEls.length) { ensureLoaded(imgEls[(k + imgEls.length) % imgEls.length]); }
+      function refreshSpinner() {
+        var el = imgEls[current];
+        var ready = el && el.complete && el.naturalWidth > 0;
+        spinner.style.display = (el && !ready) ? 'block' : 'none';
+      }
+
+      imgEls.forEach(function (el) {
+        el.addEventListener('load', refreshSpinner);
+        el.addEventListener('error', refreshSpinner);
+      });
+
+      function ensureAt(k, urgent) {
+        if (imgEls.length) { ensureLoaded(imgEls[(k + imgEls.length) % imgEls.length], urgent); }
       }
 
       function update(animate) {
-        ensureAt(current);
+        ensureAt(current, true);
         if (animate) {
           ensureAt(current + 1);
           ensureAt(current - 1);
         }
+        refreshSpinner();
         track.style.transition = animate ? 'transform 0.35s ease' : 'none';
         track.style.transform = 'translateX(' + (current * 100) + '%)';
         if (dots) {
@@ -552,7 +586,7 @@
         grid.appendChild(card);
       });
       var tk = bgToken;
-      setTimeout(function () { startBackgroundLoading(tk); }, 500);
+      setTimeout(function () { startBackgroundLoading(tk); }, 50);
     }
 
     function applyData() {
